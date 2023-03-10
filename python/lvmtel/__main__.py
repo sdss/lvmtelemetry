@@ -11,10 +11,11 @@ import os
 
 import click
 from click_default_group import DefaultGroup
-from lvmtel.actor.actor import LvmtelActor
 
 from clu.tools import cli_coro as cli_coro_lvm
 from sdsstools.daemonizer import DaemonGroup
+
+from lvmtel.actor.actor import LvmtelActor
 
 
 @click.group(cls=DefaultGroup, default="actor")

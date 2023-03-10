@@ -8,11 +8,11 @@
 import asyncio
 from logging import DEBUG
 
-from lvmtel import __version__
-
 from clu import AMQPActor
 from cluplus.configloader import Loader
 from sdsstools.logger import StreamFormatter
+
+from lvmtel import __version__
 
 from .commands import parser as command_parser
 from .commands.status import statusTick
