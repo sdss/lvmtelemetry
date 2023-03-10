@@ -1,15 +1,8 @@
-# flake8: noqa
-
-import fnmatch
 import json
-import time
 
 import requests
 
 
-#
-# get sensor_descr / sensor_values as JSON objects
-#
 def getSensorsJson(
     host,
     ssl=False,
@@ -21,6 +14,8 @@ def getSensorsJson(
     verbose=False,
 ):
     """
+    get sensor_descr / sensor_values as JSON objects
+
     import gude_sensor
     ret = gude_sensor.getSensorsJson("10.8.38.122")
     print(f"t oc: {ret['sensor_values'][0]['values'][0][0]['v']} °C")
