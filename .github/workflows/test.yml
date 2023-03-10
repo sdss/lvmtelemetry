@@ -1,0 +1,51 @@
+name: Test
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Setup
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt install libgirepository1.0-dev
+          python -m pip install --upgrade pip wheel setuptools
+          pip install .
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 . --count --show-source --statistics
+
+      - name: Lint with isort
+        run: |
+          pip install isort
+          isort -c python/
+
+      - name: Lint with black
+        run: |
+          pip install black
+          black --check python/
+          black --check tests/
