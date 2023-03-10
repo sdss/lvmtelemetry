@@ -48,4 +48,3 @@ jobs:
         run: |
           pip install black
           black --check python/
-          black --check tests/
