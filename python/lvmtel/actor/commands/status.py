@@ -37,7 +37,7 @@ async def statusTick(actor, delta_time):
     while actor.statusTask:
         try:
             if not lock.locked():
-                actor.write("i", statusSensorRead(actor.sensor))
+                actor.write("i", statusSensorRead(actor.sensor), internal=True)
 
         except Exception as e:
             actor.write("i", {"error": e})
