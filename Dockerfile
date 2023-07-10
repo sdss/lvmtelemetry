@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.11-slim-bookworm
 
 MAINTAINER Florian Briegel briegel@mpia.de
 LABEL org.opencontainers.image.source https://github.com/sdss/lvmtel

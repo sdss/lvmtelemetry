@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-# flake8: noqa
-
 import argparse
 import fnmatch
 import json
 import time
 
 import requests
+import requests.auth
 
 
 parser = argparse.ArgumentParser(prog="check_gude")
@@ -73,7 +72,7 @@ class GudeSensor:
         url += host + "/" + "status.json"
 
         auth = None
-        if username:
+        if username is not None and password is not None:
             auth = requests.auth.HTTPBasicAuth(username, password)
 
         DESCR = 0x10000
@@ -106,7 +105,7 @@ class GudeSensor:
 
             return json.loads(r.text)
         else:
-            raise ValueError("http request error {0}".format(r.status))
+            raise ValueError("http request error {0}".format(r.status_code))
 
     #
     # walk and merge sensor_descr / sensor_value
@@ -125,7 +124,7 @@ class GudeSensor:
                 # simple sensor
                 if "fields" in sensorType:
                     for sf, fieldProp in enumerate(sensorType["fields"]):
-                        field = self.store(
+                        self.store(
                             "{0}.{1}.{2}".format(st, id, sf),
                             sensorValues[si][sf]["v"],
                             fieldProp,
@@ -140,7 +139,7 @@ class GudeSensor:
                             for sf, fieldProp in enumerate(
                                 sensorType["groups"][gi]["fields"]
                             ):
-                                field = self.store(
+                                self.store(
                                     "{0}.{1}.{2}.{3}.{4}".format(st, id, gi, grm, sf),
                                     sensorValues[si][gi][grm][sf]["v"],
                                     fieldProp,
@@ -243,7 +242,7 @@ class GudeSensor:
                 if fnmatch.fnmatch(sensor, self.filter):
                     if nagios:
                         exitcode = 0
-                        if args.labelindex:
+                        if args.labelindex and isinstance(labelindex, int):
                             labelindex += 1
                         else:
                             labelindex = ""
@@ -327,8 +326,8 @@ while True:
             args.username,
             args.password,
         )
-    except:
-        print("ERROR getting sensor json")
+    except Exception as err:
+        print(f"ERROR getting sensor json: {err}")
         exit(EXIT_ERROR)
 
     gudeSensors.printSensorInfo(

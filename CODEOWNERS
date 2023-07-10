@@ -6,8 +6,8 @@
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
 *       @sdss
-*       mgjeon@khu.ac.kr
-*       lxmark888@khu.ac.kr
+*       briegel@mpia.de
+*       gallegoj@uw.edu
 
 # Order is important; the last matching pattern takes the most
 # precedence. When someone opens a pull request that only
