@@ -53,6 +53,8 @@ async def actor(ctx):
     default_config_file = pathlib.Path(__file__).parent / "etc/lvmtelemetry.yml"
     config_file = ctx.obj["config_file"] or str(default_config_file)
 
+    print("Configuration file", config_file)
+
     rmq_url = ctx.obj["rmq_url"]
 
     lvmtelemetry_obj = LVMTelemetryActor.from_config(config_file, url=rmq_url)
