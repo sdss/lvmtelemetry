@@ -29,7 +29,7 @@ async def get_sensors_json(
     url += host + "/" + "status.json"
 
     auth = None
-    if username is not None:
+    if username is not None and password is not None:
         auth = (username, password)
 
     DESCR = 0x10000
