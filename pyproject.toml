@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "sdss-lvmtel"
+name = "sdss-lvmtelemetry"
 version = "0.1.0a0"
-description = "The package for lvmtel"
+description = "The package for lvmtelemetry"
 authors = ["Florian Briegel <briegel@mpia.de>"]
 maintainers = ["José Sánchez-Gallego <gallegoj@uw.edu>"]
 license = "BSD-3-Clause"
 readme = "README.md"
-homepage = "https://github.com/sdss/lvmtel"
-repository = "https://github.com/sdss/lvmtel"
+homepage = "https://github.com/sdss/lvmtelemetry"
+repository = "https://github.com/sdss/lvmtelemetry"
 keywords = ["astronomy", "software"]
 classifiers = [
     "Intended Audience :: Science/Research",
@@ -20,12 +20,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 packages = [
-    { include = "lvmtel", from = "python" }
+    { include = "lvmtelemetry", from = "python" }
 ]
-include = ["python/lvmtel/etc/*"]
+include = ["python/lvmtelemetry/etc/*"]
 
 [tool.poetry.scripts]
-lvmtel = "lvmtel.__main__:lvmtel"
+lvmtelemetry = "lvmtelemetry.__main__:lvmtelemetry"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -50,17 +50,17 @@ fast = true
 profile = "black"
 sections = ["FUTURE", "STDLIB", "TYPING", "THIRDPARTY", "SDSS", "FIRSTPARTY", "LOCALFOLDER"]
 default_section = "THIRDPARTY"
-known_first_party = "lvmtel"
+known_first_party = "lvmtelemetry"
 known_typing = ["typing"]
 known_sdss = ["sdsstools", "clu"]
 lines_after_imports = 2
 
 [tool.pytest.ini_options]
-addopts = "--cov lvmtel --cov-report xml --cov-report html --cov-report term"
+addopts = "--cov lvmtelemetry --cov-report xml --cov-report html --cov-report term"
 
 [tool.coverage.run]
 branch = true
-include = ["python/lvmtel/*"]
+include = ["python/lvmtelemetry/*"]
 omit = [
     "*/__init__.py",
 ]

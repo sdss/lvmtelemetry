@@ -15,7 +15,7 @@ from click_default_group import DefaultGroup
 from clu.tools import cli_coro as cli_coro_lvm
 from sdsstools.daemonizer import DaemonGroup
 
-from lvmtel.actor.actor import LvmtelActor
+from lvmtelemetry.actor import LVMTelemetryActor
 
 
 @click.group(cls=DefaultGroup, default="actor")
@@ -47,7 +47,7 @@ from lvmtel.actor.actor import LvmtelActor
     help="Simulation mode.",
 )
 @click.pass_context
-def lvmtel(ctx, config_file, rmq_url, verbose, simulate):
+def lvmtelemetry(ctx, config_file, rmq_url, verbose, simulate):
     """lvm controller"""
 
     ctx.obj = {
@@ -58,23 +58,23 @@ def lvmtel(ctx, config_file, rmq_url, verbose, simulate):
     }
 
 
-@lvmtel.group(cls=DaemonGroup, prog="lvmtel_actor", workdir=os.getcwd())
+@lvmtelemetry.group(cls=DaemonGroup, prog="lvmtelemetry_actor", workdir=os.getcwd())
 @click.pass_context
 @cli_coro_lvm
 async def actor(ctx):
     """Runs the actor."""
 
     config_file = ctx.obj["config_file"]
-    lvmtel_obj = LvmtelActor.from_config(
+    lvmtelemetry_obj = LVMTelemetryActor.from_config(
         config_file,
         url=ctx.obj["rmq_url"],
         verbose=ctx.obj["verbose"],
         simulate=ctx.obj["simulate"],
     )
 
-    await lvmtel_obj.start()
-    await lvmtel_obj.run_forever()
+    await lvmtelemetry_obj.start()
+    await lvmtelemetry_obj.run_forever()
 
 
 if __name__ == "__main__":
-    lvmtel()
+    lvmtelemetry()
