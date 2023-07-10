@@ -4,7 +4,7 @@
 
 ### 🚀 New
 
-* Some code clean-up in preparation for multiplexing for multiple sensors/actors and deploying in Kubernets.
+* Some code clean-up in preparation for multiplexing for multiple sensors/actors and deploying in Kubernetes.
 
 
 ## 0.1.0
