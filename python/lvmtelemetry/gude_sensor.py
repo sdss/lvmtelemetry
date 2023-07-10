@@ -17,7 +17,6 @@ async def get_sensors_json(
     password: str | None = None,
     skipcomplex: bool = True,
     skipsimple: bool = False,
-    verbose: bool = False,
 ):
     """Get sensor data as JSON objects."""
 
