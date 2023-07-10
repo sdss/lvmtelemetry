@@ -11,4 +11,4 @@ RUN pip3 install -U pip setuptools wheel
 RUN cd lvmtel && pip3 install .
 RUN rm -Rf lvmtel
 
-ENTRYPOINT lvmtel -c $LVMTEL_CONFIG --rmq_url=$LVMTEL_RMQ_URL actor start --debug
+ENTRYPOINT lvmtelemetry start --debug
