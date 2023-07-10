@@ -30,6 +30,8 @@ lvmtel = "lvmtel.__main__:lvmtel"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
 sdss-clu = "^2.1.0"
+requests = "^2.31.0"
+httpx = "^0.24.1"
 
 [tool.poetry.dev-dependencies]
 ipython = ">=7.11.0"

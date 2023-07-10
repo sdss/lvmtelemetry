@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# flake8: noqa
-
 import argparse
 import fnmatch
 import json
@@ -125,7 +123,7 @@ class GudeSensor:
                 # simple sensor
                 if "fields" in sensorType:
                     for sf, fieldProp in enumerate(sensorType["fields"]):
-                        field = self.store(
+                        self.store(
                             "{0}.{1}.{2}".format(st, id, sf),
                             sensorValues[si][sf]["v"],
                             fieldProp,
@@ -140,7 +138,7 @@ class GudeSensor:
                             for sf, fieldProp in enumerate(
                                 sensorType["groups"][gi]["fields"]
                             ):
-                                field = self.store(
+                                self.store(
                                     "{0}.{1}.{2}.{3}.{4}".format(st, id, gi, grm, sf),
                                     sensorValues[si][gi][grm][sf]["v"],
                                     fieldProp,
@@ -327,8 +325,8 @@ while True:
             args.username,
             args.password,
         )
-    except:
-        print("ERROR getting sensor json")
+    except Exception as err:
+        print(f"ERROR getting sensor json: {err}")
         exit(EXIT_ERROR)
 
     gudeSensors.printSensorInfo(

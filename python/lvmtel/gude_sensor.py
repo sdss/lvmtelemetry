@@ -1,28 +1,25 @@
-import json
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# @Filename: gude_sensor.py
+# @License: BSD 3-clause (http://www.opensource.org/licenses/BSD-3-Clause)
 
-import requests
+from __future__ import annotations
+
+from httpx import AsyncClient
 
 
-def getSensorsJson(
-    host,
-    ssl=False,
-    timeout=5,
-    username=None,
-    password=None,
-    skipcomplex=True,
-    skipsimple=False,
-    verbose=False,
+async def get_sensors_json(
+    host: str,
+    ssl: bool = False,
+    timeout: float = 5,
+    username: str | None = None,
+    password: str | None = None,
+    skipcomplex: bool = True,
+    skipsimple: bool = False,
+    verbose: bool = False,
 ):
-    """
-    get sensor_descr / sensor_values as JSON objects
-
-    import gude_sensor
-    ret = gude_sensor.getSensorsJson("10.8.38.122")
-    print(f"t oc: {ret['sensor_values'][0]['values'][0][0]['v']} °C")
-    print(f"t ic: {ret['sensor_values'][1]['values'][0][0]['v']} °C")
-    print(f"h ic: {ret['sensor_values'][1]['values'][0][1]['v']} %")
-    print(f"t ic: {ret['sensor_values'][1]['values'][0][2]['v']} °C dewpoint")
-    """
+    """Get sensor data as JSON objects."""
 
     if ssl:
         url = "https://"
@@ -32,8 +29,8 @@ def getSensorsJson(
     url += host + "/" + "status.json"
 
     auth = None
-    if username:
-        auth = requests.auth.HTTPBasicAuth(username, password)
+    if username is not None:
+        auth = (username, password)
 
     DESCR = 0x10000
     VALUES = 0x4000
@@ -41,24 +38,19 @@ def getSensorsJson(
     SENSORS = DESCR + VALUES
 
     if skipcomplex:
-        cgi = {"components": SENSORS}  # simple-sensors only (fully backward compatible)
+        # Simple-sensors only (fully backward compatible).
+        cgi = {"components": SENSORS}
     elif skipsimple:
-        cgi = {
-            "components": SENSORS + EXTEND,
-            "types": "C",
-        }  # complex sensors-groups only
+        # Complex sensors-groups only.
+        cgi = {"components": SENSORS + EXTEND, "types": "C"}
     else:
-        cgi = {
-            "components": SENSORS + EXTEND
-        }  # simple-sensors + complex sensors-groups in one merged view
+        # Simple-sensors + complex sensors-groups in one merged view.
+        cgi = {"components": SENSORS + EXTEND}
 
-    r = requests.get(url, params=cgi, verify=False, auth=auth, timeout=timeout)
+    async with AsyncClient(auth=auth, verify=False, timeout=timeout) as client:
+        resp = await client.get(url, params=cgi)
 
-    if r.status_code == 200:
-        if verbose:
-            print(f"HTTP GET:\n\t{r.url}")
-            print(f"HTTP RESPONSE:\n\t{r.text}\n\n")
-
-        return json.loads(r.text)
+    if resp.status_code == 200:
+        return resp.json()
     else:
-        raise ValueError("http request error {0}".format(r.status))
+        raise ValueError(f"HTTP request error {resp.status_code}.")

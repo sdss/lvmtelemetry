@@ -6,22 +6,14 @@
 # @License: BSD 3-clause (http://www.opensource.org/licenses/BSD-3-Clause)
 
 import asyncio
-from logging import DEBUG
 
 from clu import AMQPActor
-from cluplus.configloader import Loader
-from sdsstools.logger import StreamFormatter
 
 from lvmtel import __version__
 
-from .commands import parser as command_parser
-from .commands.status import statusTick
 
-
-class LvmtelActor(AMQPActor):
-    """Lvmtel base actor."""
-
-    parser = command_parser
+class LVMTelemetryActor(AMQPActor):
+    """LVM Telemetry actor."""
 
     def __init__(
         self,
@@ -32,7 +24,6 @@ class LvmtelActor(AMQPActor):
     ):
         super().__init__(*args, **kwargs)
 
-        # TODO: fix schema
         self.schema = {
             "type": "object",
             "properties": {
@@ -45,28 +36,18 @@ class LvmtelActor(AMQPActor):
             "additionalProperties": False,
         }
 
-        if kwargs["verbose"]:
-            self.log.sh.setLevel(DEBUG)
-            self.log.sh.formatter = StreamFormatter(
-                fmt="%(asctime)s %(name)s %(levelname)s %(filename)s:%(lineno)d: "
-                "\033[1m%(message)s\033[21m"
-            )
-
-        self.statusLock = asyncio.Lock()
-        self.statusTask = None
         self.sensor = None
 
     async def start(self):
         """Start actor"""
+
         await super().start()
-
         self.load_schema(self.schema, is_file=False)
-        self.statusTask = self.loop.create_task(statusTick(self, 5.0))
-
         self.log.debug("Start done")
 
     async def stop(self):
-        """Stop actor and remove cameras."""
+        """Stop actor."""
+
         await super().stop()
 
     @classmethod
