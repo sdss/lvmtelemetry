@@ -32,7 +32,7 @@ from lvmtelemetry.actor import LVMTelemetryActor
     "rmq_url",
     default=None,
     type=str,
-    help="rabbitmq url, eg: amqp://guest:guest@localhost:5672/",
+    help="RabbitMQ URL, eg: amqp://guest:guest@localhost:5672/",
 )
 @click.pass_context
 def lvmtelemetry(ctx, config_file, rmq_url):
