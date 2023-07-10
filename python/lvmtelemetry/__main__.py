@@ -8,12 +8,12 @@
 # @Copyright: José Sánchez-Gallego
 
 import os
+import pathlib
 
 import click
 from click_default_group import DefaultGroup
 
-from clu.tools import cli_coro as cli_coro_lvm
-from sdsstools.daemonizer import DaemonGroup
+from sdsstools.daemonizer import DaemonGroup, cli_coro
 
 from lvmtelemetry.actor import LVMTelemetryActor
 
@@ -34,47 +34,36 @@ from lvmtelemetry.actor import LVMTelemetryActor
     type=str,
     help="rabbitmq url, eg: amqp://guest:guest@localhost:5672/",
 )
-@click.option(
-    "-v",
-    "--verbose",
-    count=True,
-    help="Debug mode. Use additional v for more details.",
-)
-@click.option(
-    "-s",
-    "--simulate",
-    count=True,
-    help="Simulation mode.",
-)
 @click.pass_context
-def lvmtelemetry(ctx, config_file, rmq_url, verbose, simulate):
-    """lvm controller"""
+def lvmtelemetry(ctx, config_file, rmq_url):
+    """LVM Telemetry sensor"""
 
     ctx.obj = {
-        "verbose": verbose,
         "config_file": config_file,
         "rmq_url": rmq_url,
-        "simulate": simulate,
     }
 
 
 @lvmtelemetry.group(cls=DaemonGroup, prog="lvmtelemetry_actor", workdir=os.getcwd())
 @click.pass_context
-@cli_coro_lvm
+@cli_coro()
 async def actor(ctx):
     """Runs the actor."""
 
-    config_file = ctx.obj["config_file"]
-    lvmtelemetry_obj = LVMTelemetryActor.from_config(
-        config_file,
-        url=ctx.obj["rmq_url"],
-        verbose=ctx.obj["verbose"],
-        simulate=ctx.obj["simulate"],
-    )
+    default_config_file = pathlib.Path(__file__).parent / "etc/lvmtelemetry.yml"
+    config_file = ctx.obj["config_file"] or str(default_config_file)
+
+    rmq_url = ctx.obj["rmq_url"]
+
+    lvmtelemetry_obj = LVMTelemetryActor.from_config(config_file, url=rmq_url)
 
     await lvmtelemetry_obj.start()
     await lvmtelemetry_obj.run_forever()
 
 
+def main():
+    lvmtelemetry(auto_envvar_prefix="LVMTELEMETRY")
+
+
 if __name__ == "__main__":
-    lvmtelemetry()
+    main()

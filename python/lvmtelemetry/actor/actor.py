@@ -6,60 +6,38 @@
 # @License: BSD 3-clause (http://www.opensource.org/licenses/BSD-3-Clause)
 
 import asyncio
+import pathlib
 
 from clu import AMQPActor
 
-from lvmtel import __version__
+from lvmtelemetry import __version__
+
+from .commands.status import emit_status
 
 
 class LVMTelemetryActor(AMQPActor):
     """LVM Telemetry actor."""
 
-    def __init__(
-        self,
-        config,
-        *args,
-        simulate: bool = False,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, version=__version__, **kwargs)
 
-        self.schema = {
-            "type": "object",
-            "properties": {
-                "temperature": {"type": "number"},
-                "dewpoint_enclosure": {"type": "number"},
-                "humidity": {"type": "number"},
-                "temperature_enclosure": {"type": "number"},
-                "humidity_enclosure": {"type": "number"},
-            },
-            "additionalProperties": False,
-        }
+        self._schema_path = pathlib.Path(__file__).parents[1] / "etc/schema.json"
+        self.sensor_host: str = self.config["sensor"]["host"]
 
-        self.sensor = None
+        self.sensor_lock = asyncio.Lock()
 
     async def start(self):
         """Start actor"""
 
         await super().start()
-        self.load_schema(self.schema, is_file=False)
-        self.log.debug("Start done")
 
-    async def stop(self):
-        """Stop actor."""
+        self.load_schema(str(self._schema_path))
 
-        await super().stop()
+        asyncio.create_task(self._emit_status_loop())
 
-    @classmethod
-    def from_config(cls, config, *args, **kwargs):
-        """Creates an actor from hierachical configuration file(s)."""
+    async def _emit_status_loop(self, delay: float = 5.0):
+        """Emits the sensor status on a loop."""
 
-        instance = super(LvmtelActor, cls).from_config(
-            config, version=__version__, loader=Loader, *args, **kwargs
-        )
-
-        if kwargs["verbose"]:
-            instance.log.fh.setLevel(DEBUG)
-            instance.log.sh.setLevel(DEBUG)
-
-        return instance
+        while True:
+            await emit_status(self, internal=True)
+            await asyncio.sleep(delay)

@@ -9,7 +9,10 @@ from __future__ import annotations
 from httpx import AsyncClient
 
 
-async def get_sensors_json(
+__all__ = ["get_sensor_json"]
+
+
+async def get_sensor_json(
     host: str,
     ssl: bool = False,
     timeout: float = 5,
@@ -53,3 +56,22 @@ async def get_sensors_json(
         return resp.json()
     else:
         raise ValueError(f"HTTP request error {resp.status_code}.")
+
+
+def unpack_json(json_data: dict):
+    """Unpacks the sensor returned JSON data into a list of sensor measurements."""
+
+    sensors: list[dict[str, float]] = []
+
+    descr = json_data["sensor_descr"]
+    values = json_data["sensor_values"]
+
+    for sensor_idx in range(len(descr)):
+        fields = descr[sensor_idx]["fields"]
+        sensors.append({})
+        for field_idx in range(len(fields)):
+            name = fields[field_idx]["name"].lower()
+            value = values[sensor_idx]["values"][0][field_idx]["v"]
+            sensors[-1][name] = value
+
+    return sensors

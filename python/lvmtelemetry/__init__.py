@@ -1,17 +1,14 @@
-# encoding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# @Author: José Sánchez-Gallego (gallegoj@uw.edu)
+# @Date: 2023-07-10
+# @Filename: __init__.py
+# @License: BSD 3-clause (http://www.opensource.org/licenses/BSD-3-Clause)
 
-from sdsstools import get_config, get_logger, get_package_version
-
-
-# pip package name
-NAME = "sdss-lvmtel"
-
-
-# Inits the logging system as NAME. Only shell logging, and exception and warning
-# catching. File logging can be started by calling log.start_file_logger(path).
-# Filename can be different than NAME.
-log = get_logger(NAME)
+from sdsstools import get_package_version
 
 
-# package name should be pip package name
+NAME = "sdss-lvmtelemetry"
+
 __version__ = get_package_version(path=__file__, package_name=NAME)

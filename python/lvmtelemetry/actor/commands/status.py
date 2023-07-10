@@ -8,64 +8,54 @@
 
 from __future__ import annotations
 
-import asyncio
+from typing import TYPE_CHECKING
 
-import click
+from clu import Command
 
-import lvmtel.gude_sensor
+from lvmtelemetry.gude_sensor import get_sensor_json, unpack_json
 
-from . import parser
+from . import lvmtel_parser
 
+
+if TYPE_CHECKING:
+    from lvmtelemetry.actor import LVMTelemetryActor
 
 __all__ = ["status"]
 
 
-def statusSensorRead(sensor):
-    data = lvmtel.gude_sensor.getSensorsJson("10.8.38.122")
+async def emit_status(
+    command_or_actor: Command[LVMTelemetryActor] | LVMTelemetryActor,
+    internal: bool = False,
+):
+    """Retrieves and emits the sensor status."""
 
-    status = {}
-    status["temperature"] = data["sensor_values"][0]["values"][0][0]["v"]
-    status["humidity"] = data["sensor_values"][1]["values"][0][1]["v"]
-    status["temperature_enclosure"] = data["sensor_values"][1]["values"][0][0]["v"]
-    status["humidity_enclosure"] = data["sensor_values"][1]["values"][0][1]["v"]
-    status["dewpoint_enclosure"] = data["sensor_values"][1]["values"][0][2]["v"]
+    if isinstance(command_or_actor, Command):
+        lock = command_or_actor.actor.sensor_lock
+        host = command_or_actor.actor.sensor_host
+    else:
+        lock = command_or_actor.sensor_lock
+        host = command_or_actor.sensor_host
 
-    return status
+    async with lock:
+        data = unpack_json(await get_sensor_json(host))
 
+    status_output = {}
+    for ii in range(len(data)):
+        status_output[f"sensor{ii+1}"] = data[ii]
 
-async def statusTick(actor, delta_time):
-    lock = actor.statusLock
+    if isinstance(command_or_actor, Command):
+        command_or_actor.info(message=status_output, internal=internal)
+    else:
+        command_or_actor.write("i", message=status_output, internal=internal)
 
-    while actor.statusTask:
-        try:
-            if not lock.locked():
-                actor.write("i", statusSensorRead(actor.sensor), internal=True)
-
-        except Exception as e:
-            actor.write("i", {"error": e})
-
-        await asyncio.sleep(delta_time)
+    return status_output
 
 
-@parser.command()
-@click.option("--statusTick", type=float, default=5)
-async def status(command, statustick: float):
-    """Returns the status of a camera."""
-
-    lock = command.actor.statusLock
+@lvmtel_parser.command()
+async def status(command: Command[LVMTelemetryActor]):
+    """Returns the sensor telemetry."""
 
     try:
-        async with lock:
-            status = statusSensorRead(command.actor.sensor)
-            command.finish(status)
-
-        if statustick > 0.0:
-            if not command.actor.statusTask:
-                command.actor.statusTask = command.actor.loop.create_task(
-                    statusTick(command.actor, statustick)
-                )
-        else:
-            command.actor.statusTask = None
-
+        await emit_status(command, internal=False)
     except Exception as ex:
         return command.error(error=ex)
