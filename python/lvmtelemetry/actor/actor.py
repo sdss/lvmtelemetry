@@ -39,5 +39,8 @@ class LVMTelemetryActor(AMQPActor):
         """Emits the sensor status on a loop."""
 
         while True:
-            await emit_status(self, internal=True)
+            try:
+                await emit_status(self, internal=True)
+            except Exception as err:
+                self.write("w", error=f"Failed emitting status with error: {err}")
             await asyncio.sleep(delay)

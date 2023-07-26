@@ -1,5 +1,12 @@
 # Changelog
 
+## Next version
+
+### 🔧 Fixed
+
+* Avoid emit status task to fail if one iteration errors.
+
+
 ## 0.2.0 - July 10, 2023
 
 ### 🚀 New
