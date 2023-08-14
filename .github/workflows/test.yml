@@ -38,7 +38,7 @@ jobs:
           pip install ruff
           ruff .
 
-      - name: Lint with isort
+      - name: Lint with black
         run: |
-          pip install isort
-          isort -c python/
+          pip install black
+          black --check python/
