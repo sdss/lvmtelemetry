@@ -57,5 +57,6 @@ async def status(command: Command[LVMTelemetryActor]):
 
     try:
         await emit_status(command, internal=False)
+        return command.finish()
     except Exception as ex:
         return command.error(error=ex)

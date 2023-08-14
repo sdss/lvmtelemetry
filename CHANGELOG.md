@@ -1,5 +1,12 @@
 # Changelog
 
+## Next version
+
+### 🔧 Fixed
+
+* Fixed status command not finishing.
+
+
 ## 0.2.1 - July 25, 2023
 
 ### 🔧 Fixed
