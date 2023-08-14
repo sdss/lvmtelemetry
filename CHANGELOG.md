@@ -6,6 +6,10 @@
 
 * Fixed status command not finishing.
 
+### ⚙️ Engineering
+
+* Lint using `ruff`.
+
 
 ## 0.2.1 - July 25, 2023
 
