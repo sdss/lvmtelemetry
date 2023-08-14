@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sdss-lvmtelemetry"
-version = "0.2.2"
+version = "0.2.3a0"
 description = "The package for lvmtelemetry"
 authors = ["Florian Briegel <briegel@mpia.de>"]
 maintainers = ["José Sánchez-Gallego <gallegoj@uw.edu>"]
